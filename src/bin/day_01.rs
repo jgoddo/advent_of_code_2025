@@ -31,7 +31,7 @@ fn main() {
         }
     }
 
-    println!("{}", res_1);
+    println!("part1: {}", res_1);
 
     let mut pos = 50;
     let mut res_2 = 0;
@@ -39,7 +39,6 @@ fn main() {
     for line in input.split('\n') {
         let (first, rest) = line.split_at(1);
         let mut offset: i32 = rest.parse().unwrap();
-        println!("{} - {}", first, rest);
 
         offset = match first {
             "L" => -offset,
@@ -51,7 +50,6 @@ fn main() {
 
         if pos >= 100 || pos <= 0 {
             res_2 += max((offset / 100).abs(), 1);
-            println!("Passes zero {} {}", res_2, pos);
         }
 
         pos = ((pos % 100) + 100) % 100;
