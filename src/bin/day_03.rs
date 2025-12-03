@@ -11,27 +11,38 @@ fn get_input() -> String {
     return content;
 }
 
+fn solve(line: &str, nchars: usize) -> String {
+    let mut res: std::vec::Vec<char> = std::vec::Vec::new();
+
+    let mut start = 0;
+
+    for offset in 0..nchars {
+        let (idx, val) = line[start..line.len() - (nchars - offset - 1)]
+            .chars()
+            .enumerate()
+            .max_by_key(|&(idx, el)| (el, -(idx as i32)))
+            .unwrap();
+        start += idx + 1;
+        res.push(val);
+    }
+    return res.iter().collect();
+}
+
 fn main() {
     let input = get_input();
 
     let mut res1 = 0;
     for line in input.split('\n') {
-        let (first_idx, first_val) = line[..line.len() - 1]
-            .chars()
-            .enumerate()
-            .max_by_key(|&(idx, el)| (el, -(idx as i32)))
-            .unwrap();
-        let (second_idx, second_val) = line[first_idx + 1..]
-            .chars()
-            .enumerate()
-            .max_by_key(|&(idx, el)| (el, -(idx as i32)))
-            .unwrap();
-
-        if TEST {
-            println!("{} -> {}{}", line, first_val, second_val)
-        }
-        let val: String = [first_val, second_val].iter().collect();
+        let val: String = solve(line, 2);
         res1 += val.parse::<i32>().unwrap();
     }
-    println!("part 1: {}", res1); // 16902 too low
+    println!("part 1: {}", res1);
+
+    let mut res2: i64 = 0;
+
+    for line in input.split('\n') {
+        let val2: String = solve(line, 12);
+        res2 += val2.parse::<i64>().unwrap();
+    }
+    println!("part 2: {}", res2);
 }
