@@ -16,7 +16,6 @@ impl Grid {
 
         for (y, line) in grid.lines().enumerate() {
             for (x, val) in line.chars().enumerate() {
-                print!("{}", val);
                 match val {
                     '.' => {
                         //free location dont care
@@ -31,7 +30,6 @@ impl Grid {
                     }
                 }
             }
-            println!();
         }
         return Grid {
             height,
@@ -40,7 +38,7 @@ impl Grid {
         };
     }
 
-    fn get_accessible_locs(self) -> Vec<(i32, i32)> {
+    fn get_accessible_locs(&self) -> Vec<(i32, i32)> {
         let mut accessible_locs = Vec::new();
         let offsets: [(i32, i32); 8] = [
             (-1, -1),
@@ -62,10 +60,22 @@ impl Grid {
             }
             if neighbor_count < 4 {
                 accessible_locs.push((*y, *x));
-                println!("{}, {}", y, x);
             }
         }
         return accessible_locs;
+    }
+
+    fn remove_accessible(&mut self) ->i32{
+        let mut accessible_locs  = self.get_accessible_locs();
+        let mut cnt = 0;
+        while accessible_locs.len() > 0 {
+            for loc in accessible_locs{
+                self.paper_locs.remove(&loc);
+                cnt +=1;
+            }
+            accessible_locs  = self.get_accessible_locs();
+        }
+        return cnt;
     }
 }
 
@@ -79,8 +89,11 @@ fn get_input() -> Grid {
 }
 
 fn main() {
-    let grid = get_input();
+    let mut grid = get_input();
 
     let res1 = grid.get_accessible_locs().len();
     println!("part1: {}", res1);
+
+    let res2 = grid.remove_accessible();
+    println!("part2: {}", res2);
 }
