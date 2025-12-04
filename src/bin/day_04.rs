@@ -3,7 +3,6 @@ use std::{collections::HashSet, fs};
 const TEST: bool = false;
 
 struct Grid {
-    lift_locs: HashSet<(i32, i32)>,
     paper_locs: HashSet<(i32, i32)>,
     height: i32,
     width: i32,
@@ -13,7 +12,6 @@ impl Grid {
     fn new(grid: String) -> Grid {
         let height: i32 = grid.lines().count().try_into().unwrap();
         let width: i32 = grid.lines().next().unwrap().len().try_into().unwrap();
-        let mut lift_locs: HashSet<(i32, i32)> = HashSet::new();
         let mut paper_locs: HashSet<(i32, i32)> = HashSet::new();
 
         for (y, line) in grid.lines().enumerate() {
@@ -27,9 +25,6 @@ impl Grid {
                         //paper location
                         paper_locs.insert((y as i32, x as i32));
                     }
-                    'x' => {
-                        lift_locs.insert((y as i32, x as i32));
-                    }
 
                     _ => {
                         panic!("invalid character found");
@@ -42,7 +37,6 @@ impl Grid {
             height,
             width,
             paper_locs,
-            lift_locs,
         };
     }
 
