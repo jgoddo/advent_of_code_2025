@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fs};
 
-const TEST: bool = true;
+const TEST: bool = false;
 
 struct Grid {
     lift_locs: HashSet<(i32, i32)>,
@@ -46,8 +46,8 @@ impl Grid {
         };
     }
 
-    fn get_accessable_locs(self) -> Vec<(i32, i32)> {
-        let mut accessable_locs = Vec::new();
+    fn get_accessible_locs(self) -> Vec<(i32, i32)> {
+        let mut accessible_locs = Vec::new();
         let offsets: [(i32, i32); 8] = [
             (-1, -1),
             (-1, 0),
@@ -58,24 +58,20 @@ impl Grid {
             (1, 0),
             (1, 1),
         ];
-        //should only iterato over paper_locs!
-        for y in 0..self.height {
-            for x in 0..self.width {
-                if self.paper_locs.contains(&(y, x)) {
-                    let mut neighbour_count = 0;
-                    for (y_offset, x_offset) in offsets {
-                        if self.paper_locs.contains(&(y + y_offset, x + x_offset)) {
-                            neighbour_count += 1;
-                        }
-                    }
-                    if neighbour_count < 4 {
-                        accessable_locs.push((y, x));
-                        println!("{}, {}", y, x);
-                    }
+
+        for (y, x) in self.paper_locs.iter() {
+            let mut neighbor_count = 0;
+            for (y_offset, x_offset) in offsets {
+                if self.paper_locs.contains(&(y + y_offset, x + x_offset)) {
+                    neighbor_count += 1;
                 }
             }
+            if neighbor_count < 4 {
+                accessible_locs.push((*y, *x));
+                println!("{}, {}", y, x);
+            }
         }
-        return accessable_locs;
+        return accessible_locs;
     }
 }
 
@@ -91,6 +87,6 @@ fn get_input() -> Grid {
 fn main() {
     let grid = get_input();
 
-    let res1 = grid.get_accessable_locs().len();
+    let res1 = grid.get_accessible_locs().len();
     println!("part1: {}", res1);
 }
