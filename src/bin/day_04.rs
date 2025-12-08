@@ -1,9 +1,8 @@
 use std::{collections::HashSet, fs};
 
-const TEST: bool = true;
+const TEST: bool = false;
 
 struct Grid {
-    lift_locs: HashSet<(i32, i32)>,
     paper_locs: HashSet<(i32, i32)>,
     height: i32,
     width: i32,
@@ -13,12 +12,10 @@ impl Grid {
     fn new(grid: String) -> Grid {
         let height: i32 = grid.lines().count().try_into().unwrap();
         let width: i32 = grid.lines().next().unwrap().len().try_into().unwrap();
-        let mut lift_locs: HashSet<(i32, i32)> = HashSet::new();
         let mut paper_locs: HashSet<(i32, i32)> = HashSet::new();
 
         for (y, line) in grid.lines().enumerate() {
             for (x, val) in line.chars().enumerate() {
-                print!("{}", val);
                 match val {
                     '.' => {
                         //free location dont care
@@ -27,27 +24,22 @@ impl Grid {
                         //paper location
                         paper_locs.insert((y as i32, x as i32));
                     }
-                    'x' => {
-                        lift_locs.insert((y as i32, x as i32));
-                    }
 
                     _ => {
                         panic!("invalid character found");
                     }
                 }
             }
-            println!();
         }
         return Grid {
             height,
             width,
             paper_locs,
-            lift_locs,
         };
     }
 
-    fn get_accessable_locs(self) -> Vec<(i32, i32)> {
-        let mut accessable_locs = Vec::new();
+    fn get_accessible_locs(&self) -> Vec<(i32, i32)> {
+        let mut accessible_locs = Vec::new();
         let offsets: [(i32, i32); 8] = [
             (-1, -1),
             (-1, 0),
@@ -58,24 +50,32 @@ impl Grid {
             (1, 0),
             (1, 1),
         ];
-        //should only iterato over paper_locs!
-        for y in 0..self.height {
-            for x in 0..self.width {
-                if self.paper_locs.contains(&(y, x)) {
-                    let mut neighbour_count = 0;
-                    for (y_offset, x_offset) in offsets {
-                        if self.paper_locs.contains(&(y + y_offset, x + x_offset)) {
-                            neighbour_count += 1;
-                        }
-                    }
-                    if neighbour_count < 4 {
-                        accessable_locs.push((y, x));
-                        println!("{}, {}", y, x);
-                    }
+
+        for (y, x) in self.paper_locs.iter() {
+            let mut neighbor_count = 0;
+            for (y_offset, x_offset) in offsets {
+                if self.paper_locs.contains(&(y + y_offset, x + x_offset)) {
+                    neighbor_count += 1;
                 }
             }
+            if neighbor_count < 4 {
+                accessible_locs.push((*y, *x));
+            }
         }
-        return accessable_locs;
+        return accessible_locs;
+    }
+
+    fn remove_accessible(&mut self) ->i32{
+        let mut accessible_locs  = self.get_accessible_locs();
+        let mut cnt = 0;
+        while accessible_locs.len() > 0 {
+            for loc in accessible_locs{
+                self.paper_locs.remove(&loc);
+                cnt +=1;
+            }
+            accessible_locs  = self.get_accessible_locs();
+        }
+        return cnt;
     }
 }
 
@@ -89,8 +89,11 @@ fn get_input() -> Grid {
 }
 
 fn main() {
-    let grid = get_input();
+    let mut grid = get_input();
 
-    let res1 = grid.get_accessable_locs().len();
+    let res1 = grid.get_accessible_locs().len();
     println!("part1: {}", res1);
+
+    let res2 = grid.remove_accessible();
+    println!("part2: {}", res2);
 }
